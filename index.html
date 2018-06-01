@@ -17,55 +17,22 @@
         <input type="checkbox" id="streetsLyr" checked> Raleigh Parks
     </span>
 
-    <style>
-            html,
-            body,
-            #viewDiv {
-              padding: 0;
-              margin: 0;
-              height: 100%;
-              width: 100%;
-            }
-        
-            #layerToggle {
-              top: 20px;
-              right: 20px;
-              position: absolute;
-              z-index: 99;
-              background-color: white;
-              border-radius: 8px;
-              padding: 10px;
-              opacity: 0.75;
-            }
-          </style>
-        
           <script>
             require([
                 "esri/Map",
-                "esri/views/SceneView",
+                "esri/views/MapView",
                 "esri/layers/FeatureLayer",
                 "dojo/dom",
                 "dojo/on",
                 "dojo/domReady!"
               ],
               function(
-                Map, SceneView, FeatureLayer, dom, on
+                Map, MapView, FeatureLayer, dom, on
               ) {
         
-                /*****************************************************************
-                 * Create two FeatureLayer instances. One pointing to a
-                 * cached map service depicting U.S. male population and the other
-                 * pointing to a layer of roads and highways.
-                 *****************************************************************/
-                var transportationLyr = new FeatureLayer({
-                  url: "https://maps.raleighnc.gov/arcgis/rest/services/Parks/Greenway/MapServer/5",
-                  // This property can be used to uniquely identify the layer
-                  id: "streets",
-                  visible: false
-                });
-        
-                var housingLyr = new FeatureLayer({
-                  url: "https://services.arcgis.com/v400IkDOw1ad7Yad/arcgis/rest/services/LOS_20180404/FeatureServer/0",
+
+                var parksLyr = new FeatureLayer({
+                  url: "https://services.arcgis.com/v400IkDOw1ad7Yad/arcgis/rest/services/ParksByExperiences/FeatureServer",
                   id: "ny-housing",
                   opacity: 0.9
                 });
@@ -75,34 +42,34 @@
                  *****************************************************************/
                 var map = new Map({
                   basemap: "oceans",
-                  layers: [housingLyr]
+                  layers: [parksLyr]
                 });
         
                 /*****************************************************************
-                 * Or they may be added to the map using map.add()
+                 * Different way to add layers
                  *****************************************************************/
-                map.add(transportationLyr);
+                // map.add(transportationLyr);
         
-                var view = new SceneView({
+                var view = new MapView({
                   container: "viewDiv",
                   map: map
                 });
         
-                /*****************************************************************
-                 * The map handles the layers' data while the view and layer views
-                 * take care of renderering the layers
-                 *****************************************************************/
-                view.on("layerview-create", function(event) {
-                  if (event.layer.id === "ny-housing") {
-                    // Explore the properties of the population layer's layer view here
-                    console.log("LayerView for male population created!", event.layerView);
-                  }
-                  if (event.layer.id === "streets") {
-                    // Explore the properties of the transportation layer's layer view here
-                    // Explore the properties of the transportation layer's layer view here
-                    console.log("LayerView for streets created!", event.layerView);
-                  }
-                });
+                // /*****************************************************************
+                //  * The map handles the layers' data while the view and layer views
+                //  * take care of renderering the layers
+                //  *****************************************************************/
+                // view.on("layerview-create", function(event) {
+                //   if (event.layer.id === "ny-housing") {
+                //     // Explore the properties of the population layer's layer view here
+                //     console.log("LayerView for male population created!", event.layerView);
+                //   }
+                //   if (event.layer.id === "streets") {
+                //     // Explore the properties of the transportation layer's layer view here
+                //     // Explore the properties of the transportation layer's layer view here
+                //     console.log("LayerView for streets created!", event.layerView);
+                //   }
+                // });
         
                 /*****************************************************************
                  * Layers are promises that resolve when loaded, or when all their
@@ -110,22 +77,11 @@
                  * the view will animate to it's initial extent.
                  *****************************************************************/
                 view.when(function() {
-                  housingLyr.when(function() {
+                  parksLyr.when(function() {
                     view.goTo({center: [-78.6382, 35.7796],zoom:12});
                   });
                 });
-        
-                var streetsLyrToggle = dom.byId("streetsLyr");
-        
-                /*****************************************************************
-                 * The visible property on the layer can be used to toggle the
-                 * layer's visibility in the view. When the visibility is turned off
-                 * the layer is still part of the map, which means you can access
-                 * its properties and perform analysis even though it isn't visible.
-                 *******************************************************************/
-                on(streetsLyrToggle, "change", function() {
-                  transportationLyr.visible = streetsLyrToggle.checked;
-                });
+
               });
           </script>
 </body>
